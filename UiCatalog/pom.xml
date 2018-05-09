@@ -9,7 +9,7 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>ebay</artifactId>
+    <artifactId>UiCatalog</artifactId>
     <dependencies>
         <dependency>
             <groupId>com.team9</groupId>
@@ -25,12 +25,11 @@
                 <version>2.20.1</version>
                 <configuration>
                     <suiteXmlFiles>
-                        <suiteXmlFile>target/test-classes/EbayAppTestRunner.xml</suiteXmlFile>
+                        <suiteXmlFile>target/test-classes/UiCatalogTestRunner.xml</suiteXmlFile>
                     </suiteXmlFiles>
                 </configuration>
             </plugin>
         </plugins>
     </build>
-
 
 </project>
