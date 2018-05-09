@@ -97,7 +97,7 @@ public class MobileAPI {
                       @Optional("") String deviceName, @Optional("") String version,@Optional("") String moduleName,
                       @Optional("") String appName)throws IOException,InterruptedException{
         if(OS.equalsIgnoreCase("ios")){
-            if(appType.contains("iPhone")){
+            if(appType.contains("siam_tests")){
                 appDirectory = new File("src/app");
                 findApp = new File(appDirectory,appName);
                 if(deviceType.equalsIgnoreCase("RealDevice")){
