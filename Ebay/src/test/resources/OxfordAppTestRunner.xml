@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+        <!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd">
+
+<suite name="NYP App Automation Test">
+
+<parameter name="OS" value="Android"/>
+<parameter name="appType" value="Phone"/>
+<parameter name="deviceType" value="Emulator"/>
+<parameter name="deviceName" value="Nexus"/>
+<parameter name="version" value="5.1"/>
+<parameter name="moduleName" value="Oxford"/>
+<parameter name="appName" value="ebay.apk"/>
+
+<test name="GoToHomePage" preserve-order="true">
+    <classes>
+        <class name="home.TestFB"/>
+        <!--<class name="home.DataDrivenTest"/>-->
+    </classes>
+</test>
+
+</suite>
