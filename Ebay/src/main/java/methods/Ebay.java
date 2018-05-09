@@ -27,7 +27,8 @@ public class Ebay extends MobileAPI {
 
 
     public void swipeDown() throws InterruptedException {
-        swipeDown(ad,702.0,676.0,2080.00,1105.00);
+        Thread.sleep(3000);
+        swipeDown(ad,733.0,733.0,2157.00,1088.00);
         Thread.sleep(3000);
     }
 
