@@ -6,11 +6,11 @@ import org.testng.annotations.Test;
 import java.security.Signature;
 
 public class TestFB extends Ebay {
-    //@Test
+    @Test
     public void home() throws InterruptedException {
         Login();
     }
-    //@Test
+    @Test
     public void testSignup() throws InterruptedException{
         signUP();
     }

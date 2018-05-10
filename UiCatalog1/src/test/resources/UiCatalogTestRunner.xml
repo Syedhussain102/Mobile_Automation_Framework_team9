@@ -4,9 +4,9 @@
 <suite name="iOS test suite on siam_tests Simulator">
 
     <parameter name="OS" value="ios"/>
-    <parameter name="appType" value="siam_tests"/>
+    <parameter name="appType" value="iPhone"/>
     <parameter name="deviceType" value="Simulator"/>
-    <parameter name="deviceName" value="siam_tests 6"/>
+    <parameter name="deviceName" value="iPhone 6"/>
     <parameter name="version" value="10.2"/>
     <parameter name="moduleName" value="UiCatalog"/>
     <parameter name="appName" value="UICatalog6.1.app.zip"/>
