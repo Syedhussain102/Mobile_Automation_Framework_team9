@@ -12,6 +12,7 @@
         <module>Generic</module>
         <module>Ebay</module>
         <module>Walmart</module>
+        <module>UiCatalog1</module>
     </modules>
 
     <dependencyManagement>

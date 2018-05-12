@@ -354,9 +354,6 @@ public class MobileAPI {
     public void typeByXpath(String locator, String value){
         ad.findElementByXPath(locator).sendKeys(value);
     }
-    public void typeByXpathNEnter(String locator, String value){
-        ad.findElementByXPath(locator).sendKeys(value,Keys.ENTER);
-    }
     public static void scrollKeys(AppiumDriver driver, String[] list, String parent) {
         System.out.println("Starting the process");
         for (int i = 0; i < list.length; i++) {
