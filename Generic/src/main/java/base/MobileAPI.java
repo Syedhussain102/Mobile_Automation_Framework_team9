@@ -97,7 +97,7 @@ public class MobileAPI {
                       @Optional("") String deviceName, @Optional("") String version,@Optional("") String moduleName,
                       @Optional("") String appName)throws IOException,InterruptedException{
         if(OS.equalsIgnoreCase("ios")){
-            if(appType.contains("siam_tests")){
+            if(appType.contains("iPhone")){
                 appDirectory = new File("src/app");
                 findApp = new File(appDirectory,appName);
                 if(deviceType.equalsIgnoreCase("RealDevice")){
@@ -353,9 +353,6 @@ public class MobileAPI {
     }
     public void typeByXpath(String locator, String value){
         ad.findElementByXPath(locator).sendKeys(value);
-    }
-    public void typeByXpathNEnter(String locator, String value){
-        ad.findElementByXPath(locator).sendKeys(value,Keys.ENTER);
     }
     public static void scrollKeys(AppiumDriver driver, String[] list, String parent) {
         System.out.println("Starting the process");

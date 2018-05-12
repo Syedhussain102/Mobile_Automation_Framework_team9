@@ -32,6 +32,15 @@ public class Ebay extends MobileAPI {
         Thread.sleep(3000);
     }
 
+    public void check(){
+        clickByXpath("//android.widget.ImageButton[@content-desc=\"Main navigation, open\"]\n");
+        clickByXpath("//android.widget.LinearLayout[@content-desc=\"Featured Deals,3 items\"]/android.widget.FrameLayout/android.widget.LinearLayout/android.widget.FrameLayout/android.widget.LinearLayout/android.widget.LinearLayout/android.widget.TextView[3]\n");
+    }
+
+    public void scrollTo(){
+        scroll_to("More");
+    }
+
 
 
 }

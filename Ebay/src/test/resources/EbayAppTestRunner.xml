@@ -14,8 +14,8 @@
 <test name="Ebay Tests" preserve-order="true">
     <classes>
         <class name="home.TestFB"/>
-        <class name="home.DataDrivenTest"/>
-        <class name="home.SearchTest"/>
+       <!-- <class name="home.DataDrivenTest"/>-->
+        <!--<class name="home.SearchTest"/>-->
     </classes>
 </test>
 

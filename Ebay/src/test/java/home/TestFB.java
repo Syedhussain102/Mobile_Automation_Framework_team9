@@ -18,4 +18,13 @@ public class TestFB extends Ebay {
     public void swipe() throws InterruptedException {
         swipeDown();
     }
+    @Test
+    public void checkEbay(){
+        check();
+    }
+    @Test
+    public void Scroll(){
+        scrollTo();
+    }
+    //
 }
