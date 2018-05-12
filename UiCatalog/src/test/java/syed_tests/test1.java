@@ -1,4 +1,11 @@
 package syed_tests;
 
-public class test1 {
+import org.testng.annotations.Test;
+import syed.method1;
+
+public class test1 extends method1 {
+    @Test
+    public void myTest(){
+        clicking();
+    }
 }
