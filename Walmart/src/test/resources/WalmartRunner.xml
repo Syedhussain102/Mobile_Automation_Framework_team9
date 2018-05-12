@@ -1,19 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd">
 
-<suite name="Walmart App Automation Test">
+<suite name="Ebay App Automation Test">
 
     <parameter name="OS" value="Android"/>
     <parameter name="appType" value="Phone"/>
     <parameter name="deviceType" value="Emulator"/>
     <parameter name="deviceName" value="Nexus"/>
-    <parameter name="version" value="5.1"/>
+    <parameter name="version" value="6.0"/>
     <parameter name="moduleName" value="Walmart"/>
-    <parameter name="appName" value="Walmart.apk"/>
+    <parameter name="appName" value="Walmart_v18.7.2_apkpure.com.apk"/>
 
-    <test name="GoToHomePage" preserve-order="true">
+    <test name="Ebay Tests" preserve-order="true">
         <classes>
-            <class name="testBase.searchTest"/>
+            <class name="testBase.TestSearch"/>
         </classes>
     </test>
 

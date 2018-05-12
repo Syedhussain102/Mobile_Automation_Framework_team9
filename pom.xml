@@ -13,6 +13,8 @@
         <module>Ebay</module>
         <module>Walmart</module>
         <module>uiCatalog</module>
+        <module>Walmart</module>
+        <module>NewUiCatalog</module>
     </modules>
 
     <dependencyManagement>
