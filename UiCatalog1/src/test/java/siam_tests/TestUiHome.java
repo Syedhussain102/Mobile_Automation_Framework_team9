@@ -5,7 +5,7 @@ import siam.UiHome;
 
 public class TestUiHome extends UiHome {
     @Test
-    public void test1(){
+    public void test1() {
         clickBtns();
     }
 }

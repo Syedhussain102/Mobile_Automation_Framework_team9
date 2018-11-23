@@ -5,7 +5,7 @@ import org.testng.annotations.Test;
 
 public class HomePageTest extends HomePage {
     @Test
-    public void SideBar(){
+    public void SideBar() {
 
         sideBar();
     }

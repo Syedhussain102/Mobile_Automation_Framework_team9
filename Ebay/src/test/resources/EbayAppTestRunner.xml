@@ -1,22 +1,22 @@
 <?xml version="1.0" encoding="UTF-8"?>
-        <!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd">
+<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd">
 
 <suite name="Ebay App Automation Test">
 
-<parameter name="OS" value="Android"/>
-<parameter name="appType" value="Phone"/>
-<parameter name="deviceType" value="Emulator"/>
-<parameter name="deviceName" value="Nexus"/>
-<parameter name="version" value="5.1"/>
-<parameter name="moduleName" value="Ebay"/>
-<parameter name="appName" value="ebay.apk"/>
+    <parameter name="OS" value="Android"/>
+    <parameter name="appType" value="Phone"/>
+    <parameter name="deviceType" value="Emulator"/>
+    <parameter name="deviceName" value="Nexus"/>
+    <parameter name="version" value="5.1"/>
+    <parameter name="moduleName" value="Ebay"/>
+    <parameter name="appName" value="tinder.apk"/>
 
-<test name="Ebay Tests" preserve-order="true">
-    <classes>
-       <!-- <class name="home.TestFB"/>-->
-        <class name="home.DataDrivenTest"/>
-        <!--<class name="home.SearchTest"/>-->
-    </classes>
-</test>
+    <test name="Ebay Tests" preserve-order="true">
+        <classes>
+            <!-- <class name="home.TestFB"/>-->
+            <class name="home.DataDrivenTest"/>
+            <!--<class name="home.SearchTest"/>-->
+        </classes>
+    </test>
 
 </suite>

@@ -5,5 +5,7 @@ import org.junit.Test;
 
 public class searchTest extends mainClass {
     @Test
-    public void singleItemSearch(){learnMore();}
+    public void singleItemSearch() {
+        learnMore();
+    }
 }

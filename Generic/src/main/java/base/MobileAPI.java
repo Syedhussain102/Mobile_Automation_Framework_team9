@@ -1,7 +1,5 @@
 package base;
 
-import reporting.ExtentManager;
-import reporting.ExtentTestManager;
 import com.relevantcodes.extentreports.ExtentReports;
 import com.relevantcodes.extentreports.LogStatus;
 import io.appium.java_client.*;
@@ -18,8 +16,10 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 import org.testng.ITestContext;
 import org.testng.ITestResult;
 import org.testng.SkipException;
-import org.testng.annotations.*;
 import org.testng.annotations.Optional;
+import org.testng.annotations.*;
+import reporting.ExtentManager;
+import reporting.ExtentTestManager;
 
 import java.io.File;
 import java.io.IOException;
@@ -35,25 +35,144 @@ import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 
 public class MobileAPI {
+    private static final List<Function<String, By>> resolvers = Arrays.asList(By::id, By::className, By::xpath);
     public static ExtentReports extent;
+    public static AppiumDriver ad = null;
+    private static WebDriverWait driverWait;
+    public File appDirectory = null;
+    public File findApp = null;
+
+    protected static void skip() throws SkipException {
+        throw new SkipException("Skipping this test");
+    }
+
+    public static void scrollKeys(AppiumDriver driver, String[] list, String parent) {
+        System.out.println("Starting the process");
+        for (int i = 0; i < list.length; i++) {
+            MobileElement we = (MobileElement) driver.findElementByXPath(parent + "/UIAPickerWheel[" + (i + 1) + "]");
+            we.sendKeys(list[i]);
+        }
+        System.out.println("Ending Process");
+    }
+
+    /////-----*****-----/////-----*****-----/////-----*****-----/////-----*****-----/////-----*****-----/////
+    // Set implicit wait in seconds
+    public static void setWait(int seconds) {
+        ad.manage().timeouts().implicitlyWait(seconds, TimeUnit.SECONDS);
+    }
+
+    // Return an element by locator
+    public static WebElement element(By locator) {
+        return ad.findElement(locator);
+    }
+
+    // Return a list of elements by locator
+    public static List<WebElement> elements(By locator) {
+        return ad.findElements(locator);
+    }
+
+    // Press the back button
+    public static void back() {
+        ad.navigate().back();
+    }
+
+    // Return a list of elements by tag name
+    public static List<WebElement> tags(String tagName) {
+        return elements(for_tags(tagName));
+    }
+
+    // Return a tag name locator
+    public static By for_tags(String tagName) {
+        return By.className(tagName);
+    }
+
+    // Return a static text element by xpath index
+    public static WebElement s_text(int xpathIndex) {
+        return element(for_text(xpathIndex));
+    }
+
+    // Return a static text locator by xpath index
+    public static By for_text(int xpathIndex) {
+        return By.xpath("//android.widget.TextView[" + xpathIndex + "]");
+    }
+
+    // Return a static text element that contains text
+    public static WebElement text(String text) {
+        return element(for_text(text));
+    }
+
+    // Return a static text locator that contains text
+    public static By for_text(String text) {
+        return By.xpath("//android.widget.TextView[contains(@text, '" + text + "')]");
+    }
+
+    // Return a static text element by exact text
+    public static WebElement text_exact(String text) {
+        return element(for_text_exact(text));
+    }
+
+    // Return a static text locator by exact text
+    public static By for_text_exact(String text) {
+        return By.xpath("//android.widget.TextView[@text='" + text + "']");
+    }
+
+    public static By for_find(String value) {
+        return By.xpath("//*[@content-desc=\"" + value + "\" or @resource-id=\"" + value +
+                "\" or @text=\"" + value + "\"] | //*[contains(translate(@content-desc,\"" + value +
+                "\",\"" + value + "\"), \"" + value + "\") or contains(translate(@text,\"" + value +
+                "\",\"" + value + "\"), \"" + value + "\") or @resource-id=\"" + value + "\"]");
+    }
+
+    public static WebElement find(String value) {
+        return element(for_find(value));
+    }
+
+    // Wait 30 seconds for locator to find an element
+    public static WebElement wait(By locator) {
+        return driverWait.until(ExpectedConditions.visibilityOfElementLocated(locator));
+    }
+
+    // Wait 60 seconds for locator to find all elements
+    public static List<WebElement> waitAll(By locator) {
+        return driverWait.until(ExpectedConditions.visibilityOfAllElementsLocatedBy(locator));
+    }
+
+    // Wait 60 seconds for locator to not find a visible element
+    public static boolean waitInvisible(By locator) {
+        return driverWait.until(ExpectedConditions.invisibilityOfElementLocated(locator));
+    }
+
+    // Return an element that contains name or text
+    public static WebElement scroll_to(String value) {
+        return ad.scrollTo(value);
+    }
+
+    // Return an element that exactly matches name or text
+    public static WebElement scroll_to_exact(String value) {
+        return ad.scrollToExact(value);
+    }
+
     @BeforeSuite
     public void extentSetup(ITestContext context) {
         ExtentManager.setOutputDirectory(context);
         extent = ExtentManager.getInstance();
     }
+
     @BeforeMethod
     public void startExtent(Method method) {
         String className = convertCamelCase(method.getDeclaringClass().getSimpleName());
         String methodName = convertCamelCase(method.getName()).toLowerCase();
-        ExtentTestManager.startTest( methodName );
+        ExtentTestManager.startTest(methodName);
         ExtentTestManager.getTest().assignCategory(className);
     }
+
     protected String getStackTrace(Throwable t) {
         StringWriter sw = new StringWriter();
         PrintWriter pw = new PrintWriter(sw);
         t.printStackTrace(pw);
         return sw.toString();
     }
+
     @Parameters({"appName"})
     @AfterMethod
     public void afterEachTestMethod(@Optional("") String appName, ITestResult result) {
@@ -72,11 +191,12 @@ public class MobileAPI {
         ExtentTestManager.endTest();
         extent.flush();
         if (result.getStatus() == ITestResult.FAILURE) {
-            captureScreenShot(result.getName(),ad);
+            captureScreenShot(result.getName(), ad);
         }
         ad.removeApp(appName);
         ad.quit();
     }
+
     @AfterSuite
     public void generateReport() {
         extent.close();
@@ -87,63 +207,62 @@ public class MobileAPI {
         calendar.setTimeInMillis(millis);
         return calendar.getTime();
     }
-    public static AppiumDriver ad = null;
-    private static WebDriverWait driverWait;
-    public File appDirectory = null;
-    public File findApp = null;
-    @Parameters({"OS","appType","deviceType", "deviceName","version", "moduleName","appName"})
+
+    @Parameters({"OS", "appType", "deviceType", "deviceName", "version", "moduleName", "appName"})
     @BeforeMethod
-    public void setUp(@Optional("android")String OS,@Optional("mobile") String appType,@Optional("real device") String deviceType,
-                      @Optional("") String deviceName, @Optional("") String version,@Optional("") String moduleName,
-                      @Optional("") String appName)throws IOException,InterruptedException{
-        if(OS.equalsIgnoreCase("ios")){
-            if(appType.contains("iPhone")){
+    public void setUp(@Optional("android") String OS, @Optional("mobile") String appType, @Optional("real device") String deviceType,
+                      @Optional("") String deviceName, @Optional("") String version, @Optional("") String moduleName,
+                      @Optional("") String appName) throws IOException, InterruptedException {
+        if (OS.equalsIgnoreCase("ios")) {
+            if (appType.contains("iPhone")) {
                 appDirectory = new File("src/app");
-                findApp = new File(appDirectory,appName);
-                if(deviceType.equalsIgnoreCase("RealDevice")){
-                    ad = setUpiOsEnv(deviceName,version);
-                }else if (deviceType.equalsIgnoreCase("Simulator")){
-                    ad = setUpiOsEnv(deviceName,version);
+                findApp = new File(appDirectory, appName);
+                if (deviceType.equalsIgnoreCase("RealDevice")) {
+                    ad = setUpiOsEnv(deviceName, version);
+                } else if (deviceType.equalsIgnoreCase("Simulator")) {
+                    ad = setUpiOsEnv(deviceName, version);
                 }
-            }else if(appType.equalsIgnoreCase("iPad 2")){
+            } else if (appType.equalsIgnoreCase("iPad 2")) {
                 appDirectory = new File("src/app");
-                findApp = new File(appDirectory,appName);
-                if(deviceType.contains("RealDevice")){
-                    ad = setUpiOsEnv(deviceName,version);
-                }else if (deviceType.equalsIgnoreCase("Simulator")){
-                    ad = setUpiOsEnv(deviceName,version);
+                findApp = new File(appDirectory, appName);
+                if (deviceType.contains("RealDevice")) {
+                    ad = setUpiOsEnv(deviceName, version);
+                } else if (deviceType.equalsIgnoreCase("Simulator")) {
+                    ad = setUpiOsEnv(deviceName, version);
                 }
             }
-        }else if(OS.equalsIgnoreCase("Android")){
-            if(appType.contains("Phone")){
+        } else if (OS.equalsIgnoreCase("Android")) {
+            if (appType.contains("Phone")) {
                 appDirectory = new File("src/app");
-                findApp = new File(appDirectory,appName);
-                if(deviceType.equalsIgnoreCase("RealDevice")){
-                    ad = setUpAndroidEnv(deviceName,version);
-                }else if (deviceType.equalsIgnoreCase("Emulator")){
-                    ad =setUpAndroidEnv(deviceName,version);
+                findApp = new File(appDirectory, appName);
+                if (deviceType.equalsIgnoreCase("RealDevice")) {
+                    ad = setUpAndroidEnv(deviceName, version);
+                } else if (deviceType.equalsIgnoreCase("Emulator")) {
+                    ad = setUpAndroidEnv(deviceName, version);
                 }
-            }else if(OS.equalsIgnoreCase("Tablets")){
-                if(deviceType.equalsIgnoreCase("RealDevice")){
-                    ad = setUpAndroidEnv(deviceName,version);
-                }else if (deviceType.equalsIgnoreCase("Emulator")){
-                    ad = setUpAndroidEnv(deviceName,version);
+            } else if (OS.equalsIgnoreCase("Tablets")) {
+                if (deviceType.equalsIgnoreCase("RealDevice")) {
+                    ad = setUpAndroidEnv(deviceName, version);
+                } else if (deviceType.equalsIgnoreCase("Emulator")) {
+                    ad = setUpAndroidEnv(deviceName, version);
                 }
             }
         }
     }
-    public AppiumDriver setUpiOsEnv(String deviceName,String version)throws IOException,InterruptedException{
+
+    public AppiumDriver setUpiOsEnv(String deviceName, String version) throws IOException, InterruptedException {
         DesiredCapabilities cap = new DesiredCapabilities();
         cap.setCapability(MobileCapabilityType.DEVICE_NAME, deviceName);
         cap.setCapability(MobileCapabilityType.PLATFORM_NAME, MobilePlatform.IOS);
         cap.setCapability(MobileCapabilityType.PLATFORM_VERSION, version);
         cap.setCapability(MobileCapabilityType.APP, findApp.getAbsolutePath());
-        ad = new IOSDriver(new URL("http://127.0.0.1:4723/wd/hub"), cap);
+        ad = new IOSDriver(new URL("http://127.0.0.1:/wd/hub"), cap);
         ad.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
         return ad;
 
     }
-    public AppiumDriver setUpAndroidEnv(String deviceName,String version)throws IOException,InterruptedException{
+
+    public AppiumDriver setUpAndroidEnv(String deviceName, String version) throws IOException, InterruptedException {
         DesiredCapabilities cap = new DesiredCapabilities();
         cap.setCapability(MobileCapabilityType.DEVICE_NAME, deviceName);
         cap.setCapability(MobileCapabilityType.PLATFORM_NAME, MobilePlatform.ANDROID);
@@ -153,14 +272,10 @@ public class MobileAPI {
         ad.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
         return ad;
     }
-    protected static void skip() throws SkipException {
-        throw new SkipException("Skipping this test");
-    }
-    private String convertCamelCase(String words){
+
+    private String convertCamelCase(String words) {
         return StringUtils.join(StringUtils.splitByCharacterTypeCamelCase(words), ' ');
     }
-
-    private static final List<Function<String, By>> resolvers = Arrays.asList(By::id, By::className, By::xpath);
 
     public WebElement locateElement(AppiumDriver ad, String locator) {
         WebElement el = null;
@@ -179,22 +294,27 @@ public class MobileAPI {
         }
         return el;
     }
+
     public void clickOnElement(AppiumDriver ad, String locator) {
         locateElement(ad, locator).click();
 
     }
+
     public void enterValueOnElement(AppiumDriver ad, String locator, String value) {
         locateElement(ad, locator).sendKeys(value);
 
     }
+
     public void swipeOnElement(AppiumDriver ad, String locator) {
         locateElement(ad, locator);
 
     }
+
     public void waitUntilPresence(AppiumDriver ad, String locator) {
         WebDriverWait wait = new WebDriverWait(ad, 45);
         wait.until(ExpectedConditions.presenceOfElementLocated(By.id(locator)));
     }
+
     public boolean validateClickable(AppiumDriver ad, WebElement element) {
         try {
             WebDriverWait wait = new WebDriverWait(ad, 10);
@@ -204,14 +324,17 @@ public class MobileAPI {
         }
         return true;
     }
+
     public void waitUntilClickable(AppiumDriver ad, String locator) {
         WebDriverWait wait = new WebDriverWait(ad, 45);
         //wait.until(ExpectedConditions.elementToBeClickable(By.id(locator)));
     }
+
     public void clickWhenClickable(AppiumDriver ad, String locator) {
         WebDriverWait wait = new WebDriverWait(ad, 45);
         wait.until(ExpectedConditions.elementToBeClickable(By.id(locator))).click();
     }
+
     public void clickOnElementWithText(List<WebElement> elementList, String targetText) {
         for (WebElement element : elementList) {
             if (element.getText().contains(targetText)) {
@@ -223,22 +346,27 @@ public class MobileAPI {
             }
         }
     }
+
     public void clearField(AppiumDriver ad, String locator) {
         locateElement(ad, locator).clear();
     }
+
     public void clickByXpathOnIOS(AppiumDriver ad, String locator) {
         //new TouchAction((MobileDriver) ad).tap(By.xpath(locator)).perform();
         ad.tap(1, ad.findElement(MobileBy.xpath(locator)), 200);
     }
+
     public void sleep(int sec) {
         try {
             Thread.sleep(1000 * sec);
         } catch (InterruptedException e) {
         }
     }
+
     public void type(AppiumDriver ad, String locator, String value) {
         locateElement(ad, locator).sendKeys(value);
     }
+
     public List<String> getTexts(List<WebElement> elements) {
         List<String> text = new ArrayList<String>();
         for (WebElement element : elements) {
@@ -246,14 +374,17 @@ public class MobileAPI {
         }
         return text;
     }
+
     public void touch(AppiumDriver ad, WebElement locator) {
         TouchAction touchAction = new TouchAction(ad);
         touchAction.moveTo(locator);
     }
+
     private Dimension getDemensions(AppiumDriver ad) {
         Dimension size = ad.manage().window().getSize();
         return size;
     }
+
     private HashMap<String, Integer> setXandY(AppiumDriver ad, Double startX, Double endX, Double startY, Double endY) {
         HashMap<String, Integer> dimensions = new HashMap<String, Integer>();
         Dimension size = getDemensions(ad);
@@ -263,26 +394,32 @@ public class MobileAPI {
         dimensions.put("endY", (int) (size.height / endY)); // 2
         return dimensions;
     }
+
     public void swipeRightToLeft(AppiumDriver ad, Double startX, Double endX, Double startY, Double endY) {
         HashMap<String, Integer> d = setXandY(ad, startX, endX, startY, endY);
         ad.swipe(d.get("startX"), d.get("startY"), d.get("endX"), d.get("startY"), 3000);
     }
+
     public void swipeLeftToRight(AppiumDriver ad, Double startX, Double endX, Double startY, Double endY) {
         HashMap<String, Integer> d = setXandY(ad, startX, endX, startY, endY);
         ad.swipe(d.get("endX"), d.get("startY"), d.get("startX"), d.get("startY"), 3000);
     }
+
     public void swipeUp(AppiumDriver ad, Double startX, Double endX, Double startY, Double endY) {
         HashMap<String, Integer> d = setXandY(ad, startX, endX, startY, endY);
         ad.swipe(d.get("startX"), d.get("startY"), d.get("endX"), d.get("endT"), 3000);
     }
+
     public void swipeDown(AppiumDriver ad, Double startX, Double endX, Double startY, Double endY) {
         //Get the size of screen.
         HashMap<String, Integer> d = setXandY(ad, startX, endX, startY, endY);
         ad.swipe(d.get("startX"), d.get("startY"), d.get("endX"), d.get("endT"), 3000);
     }
+
     public String getText(AppiumDriver ad, String locator) {
         return locateElement(ad, locator).getText();
     }
+
     public void sleepFor(int time) {
         try {
             Thread.sleep(1000 * time);
@@ -290,9 +427,11 @@ public class MobileAPI {
             e.printStackTrace();
         }
     }
+
     public void tapOn(AppiumDriver ad, String element) {
         new TouchAction((MobileDriver) ad.findElement(By.xpath(element)));
     }
+
     public void captureScreenShot(String className, AppiumDriver ad) {
         String destDir = "";
         File scrFile = ((TakesScreenshot) ad).getScreenshotAs(OutputType.FILE);
@@ -306,6 +445,7 @@ public class MobileAPI {
             e.printStackTrace();
         }
     }
+
     public void captureScreenShot(ITestResult result, String status) {
         String destDir = "";
         String passfailMethod = result.getMethod().getRealClass().getSimpleName() + "." + result.getMethod().getMethodName();
@@ -324,6 +464,7 @@ public class MobileAPI {
             e.printStackTrace();
         }
     }
+
     public void swipeUpNDown(AppiumDriver ad) {
         //Get the size of screen.
         Dimension size = ad.manage().window().getSize();
@@ -339,110 +480,47 @@ public class MobileAPI {
         //ad.swipe(startx, endy, startx, starty, 3000);
         ad.swipe(startx, endy, startx, starty, 3000);
     }
-    public void scrollAndClickByName(String locator){
+
+    public void scrollAndClickByName(String locator) {
         ad.scrollTo(locator).click();
     }
-    public void clickByXpath(String locator){
+
+    public void clickByXpath(String locator) {
         ad.findElement(By.xpath(locator)).click();
     }
-    public void clickByXpathWebElement(WebElement locator){
+
+    public void clickByXpathWebElement(WebElement locator) {
         locator.click();
     }
-    public void typeByXpath(String locator, String value, Key key){
+
+    public void typeByXpath(String locator, String value, Key key) {
         ad.findElement(By.xpath(locator)).sendKeys(value);
     }
-    public void typeByXpath(String locator, String value){
+
+    public void typeByXpath(String locator, String value) {
         ad.findElementByXPath(locator).sendKeys(value);
     }
-    public static void scrollKeys(AppiumDriver driver, String[] list, String parent) {
-        System.out.println("Starting the process");
-        for (int i = 0; i < list.length; i++) {
-            MobileElement we = (MobileElement) driver.findElementByXPath(parent+"/UIAPickerWheel["+(i+1)+"]");
-            we.sendKeys(list[i]);
-        }
-        System.out.println("Ending Process");
-    }
-    public void scrollToElement(AppiumDriver driver, String text){
+
+    public void scrollToElement(AppiumDriver driver, String text) {
         MobileElement we = (MobileElement) driver.findElementByXPath(text);
         driver.scrollTo(we.getText());
     }
-    /////-----*****-----/////-----*****-----/////-----*****-----/////-----*****-----/////-----*****-----/////
-    // Set implicit wait in seconds
-    public static void setWait(int seconds) {
-        ad.manage().timeouts().implicitlyWait(seconds, TimeUnit.SECONDS);
+
+    public void switchView(int web1native0) {
+        try {
+            Set<String> handles = ad.getContextHandles();
+            List<String> handlesList = new ArrayList(handles);
+            Thread.sleep(2000);
+            ad.context(handlesList.get(web1native0));
+            Thread.sleep(2000);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
     }
 
-    // Return an element by locator
-    public static WebElement element(By locator) {
-        return ad.findElement(locator);
+    public String getPageSource() {
+        return ad.getPageSource();
     }
-    // Return a list of elements by locator
-    public static List<WebElement> elements(By locator) {
-        return ad.findElements(locator);
-    }
-    // Press the back button
-    public static void back() {
-        ad.navigate().back();
-    }
-    // Return a list of elements by tag name
-    public static List<WebElement> tags(String tagName) {
-        return elements(for_tags(tagName));
-    }
-    // Return a tag name locator
-    public static By for_tags(String tagName) {
-        return By.className(tagName);
-    }
-    // Return a static text element by xpath index
-    public static WebElement s_text(int xpathIndex) {
-        return element(for_text(xpathIndex));
-    }
-    // Return a static text locator by xpath index
-    public static By for_text(int xpathIndex) {
-        return By.xpath("//android.widget.TextView[" + xpathIndex + "]");
-    }
-    // Return a static text element that contains text
-    public static WebElement text(String text) {
-        return element(for_text(text));
-    }
-    // Return a static text locator that contains text
-    public static By for_text(String text) {
-        return By.xpath("//android.widget.TextView[contains(@text, '" + text + "')]");
-    }
-    // Return a static text element by exact text
-    public static WebElement text_exact(String text) {
-        return element(for_text_exact(text));
-    }
-    // Return a static text locator by exact text
-    public static By for_text_exact(String text) {
-        return By.xpath("//android.widget.TextView[@text='" + text + "']");
-    }
-    public static By for_find(String value) {
-        return By.xpath("//*[@content-desc=\"" + value + "\" or @resource-id=\"" + value +
-                "\" or @text=\"" + value + "\"] | //*[contains(translate(@content-desc,\"" + value +
-                "\",\"" + value + "\"), \"" + value + "\") or contains(translate(@text,\"" + value +
-                "\",\"" + value + "\"), \"" + value + "\") or @resource-id=\"" + value + "\"]");
-    }
-    public static WebElement find(String value) {
-        return element(for_find(value));
-    }
-    // Wait 30 seconds for locator to find an element
-    public static WebElement wait(By locator) {
-        return driverWait.until(ExpectedConditions.visibilityOfElementLocated(locator));
-    }
-    // Wait 60 seconds for locator to find all elements
-    public static List<WebElement> waitAll(By locator) {
-        return driverWait.until(ExpectedConditions.visibilityOfAllElementsLocatedBy(locator));
-    }
-    // Wait 60 seconds for locator to not find a visible element
-    public static boolean waitInvisible(By locator) {
-        return driverWait.until(ExpectedConditions.invisibilityOfElementLocated(locator));
-    }
-    // Return an element that contains name or text
-    public static WebElement scroll_to(String value) {
-        return ad.scrollTo(value);
-    }
-    // Return an element that exactly matches name or text
-    public static WebElement scroll_to_exact(String value) {
-        return ad.scrollToExact(value);
-    }
+
+
 }

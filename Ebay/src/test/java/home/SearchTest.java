@@ -7,8 +7,8 @@ import org.testng.annotations.Test;
 
 public class SearchTest extends MobileAPI {
     @Test
-    public void testSearch1(){
-        Search search = PageFactory.initElements(ad,Search.class);
+    public void testSearch1() {
+        Search search = PageFactory.initElements(ad, Search.class);
         search.search2();
     }
 }

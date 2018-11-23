@@ -3,6 +3,7 @@ package reporting;
 import com.relevantcodes.extentreports.ExtentReports;
 import org.testng.ITestContext;
 import org.testng.Reporter;
+
 import java.io.File;
 
 public class ExtentManager {
@@ -15,13 +16,14 @@ public class ExtentManager {
             File resultDirectory = new File(outputDirectory.getParentFile(), "html");
             extent = new ExtentReports(System.getProperty("user.dir") + "/Extent-Report/ExtentReport.html", true);
             Reporter.log("Extent Report directory: " + resultDirectory, true);
-            extent.addSystemInfo("Host Name" , "Local")
+            extent.addSystemInfo("Host Name", "Local")
                     .addSystemInfo("Environment", "QA")
                     .addSystemInfo("User Name", "Team9");
             extent.loadConfig(new File(System.getProperty("user.dir") + "/report-config.xml"));
         }
         return extent;
     }
+
     public static void setOutputDirectory(ITestContext context) {
         ExtentManager.context = context;
     }

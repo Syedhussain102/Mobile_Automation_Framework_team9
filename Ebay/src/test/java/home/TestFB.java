@@ -3,27 +3,29 @@ package home;
 import methods.Ebay;
 import org.testng.annotations.Test;
 
-import java.security.Signature;
-
 public class TestFB extends Ebay {
     @Test
     public void home() throws InterruptedException {
         Login();
     }
+
     @Test
-    public void testSignup() throws InterruptedException{
+    public void testSignup() throws InterruptedException {
         signUP();
     }
+
     @Test
     public void swipe() throws InterruptedException {
         swipeDown();
     }
+
     @Test
-    public void checkEbay(){
+    public void checkEbay() {
         check();
     }
+
     @Test
-    public void Scroll(){
+    public void Scroll() {
         scrollTo();
     }
 }

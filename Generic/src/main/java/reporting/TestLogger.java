@@ -10,10 +10,12 @@ public class TestLogger {
         Reporter.log(message, true);
         reporting.ExtentTestManager.getTest().log(LogStatus.INFO, message + "<br>");
     }
+
     public static void log(final StringUtils message) {
         Reporter.log(message + "<br>", true);
         reporting.ExtentTestManager.getTest().log(LogStatus.INFO, message + "<br>");
     }
+
     public static void log(final String message, WebDriver driver) {
         Reporter.log(message + "<br>", true);
         reporting.ExtentTestManager.getTest().log(LogStatus.INFO, message + "<br>");
